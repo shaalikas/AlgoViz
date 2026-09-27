@@ -1,16 +1,16 @@
 const API_BASE = "http://localhost:5000";
- 
+
 mermaid.initialize({ startOnLoad: false, theme: "dark" });
- 
+
 // ---------- View switching ----------
 const viewGenerateBtn = document.getElementById("viewGenerate");
 const viewHistoryBtn = document.getElementById("viewHistory");
 const generateView = document.getElementById("generateView");
 const historyView = document.getElementById("historyView");
- 
+
 viewGenerateBtn.addEventListener("click", () => switchView("generate"));
 viewHistoryBtn.addEventListener("click", () => switchView("history"));
- 
+
 function switchView(view) {
   const isGenerate = view === "generate";
   generateView.classList.toggle("hidden", !isGenerate);
@@ -19,7 +19,7 @@ function switchView(view) {
   viewHistoryBtn.classList.toggle("active", !isGenerate);
   if (!isGenerate) loadHistory();
 }
- 
+
 // ---------- Generate flow ----------
 const codeInput = document.getElementById("codeInput");
 const generateBtn = document.getElementById("generateBtn");
@@ -29,48 +29,51 @@ const results = document.getElementById("results");
 const emptyState = document.getElementById("emptyState");
 const diagramDiv = document.getElementById("diagram");
 const explanationP = document.getElementById("explanation");
- 
+const downloadBtn = document.getElementById("downloadDiagram");
+
 generateBtn.addEventListener("click", handleGenerate);
- 
+
 async function handleGenerate() {
   const code = codeInput.value.trim();
   hideError();
- 
+
   if (!code) {
     showError("Please paste some code first.");
     return;
   }
- 
+
   setLoading(true);
- 
+
   try {
     const res = await fetch(`${API_BASE}/api/generate`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ code }),
     });
- 
+
     const data = await res.json();
- 
+
     if (!res.ok) {
       throw new Error(data.error || "Something went wrong while parsing.");
     }
- 
+
     await renderResults(data.mermaidCode, data.explanation);
+    showToast("Diagram generated successfully!");
   } catch (err) {
     showError(err.message || "Failed to reach the server. Is the backend running?");
     emptyState.classList.remove("hidden");
     results.classList.add("hidden");
+    showToast("Error generating diagram");
   } finally {
     setLoading(false);
   }
 }
- 
+
 async function renderResults(mermaidCode, explanation) {
   emptyState.classList.add("hidden");
   results.classList.remove("hidden");
   explanationP.textContent = explanation || "No explanation available.";
- 
+
   diagramDiv.innerHTML = "";
   try {
     const { svg } = await mermaid.render("diagramSvg-" + Date.now(), mermaidCode);
@@ -79,7 +82,26 @@ async function renderResults(mermaidCode, explanation) {
     diagramDiv.innerHTML = `<p class="error">Couldn't render diagram.</p>`;
   }
 }
- 
+
+// ---------- Download Diagram ----------
+downloadBtn.addEventListener("click", () => {
+  const svgElement = diagramDiv.querySelector("svg");
+  if (!svgElement) {
+    showToast("No diagram to download");
+    return;
+  }
+  const svgData = new XMLSerializer().serializeToString(svgElement);
+  const blob = new Blob([svgData], { type: "image/svg+xml" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "diagram.svg";
+  link.click();
+  URL.revokeObjectURL(url);
+  showToast("Diagram downloaded!");
+});
+
+// ---------- Loading/Error helpers ----------
 function setLoading(isLoading) {
   generateBtn.disabled = isLoading;
   loading.classList.toggle("hidden", !isLoading);
@@ -88,32 +110,33 @@ function setLoading(isLoading) {
     emptyState.classList.add("hidden");
   }
 }
- 
+
 function showError(msg) {
   errorMsg.textContent = msg;
   errorMsg.classList.remove("hidden");
 }
- 
+
 function hideError() {
   errorMsg.classList.add("hidden");
   errorMsg.textContent = "";
 }
- 
+
 // ---------- History flow ----------
 const historyList = document.getElementById("historyList");
 const historyDetail = document.getElementById("historyDetail");
- 
+const historySearch = document.getElementById("historySearch");
+
 async function loadHistory() {
   historyList.innerHTML = "<li>Loading…</li>";
   try {
     const res = await fetch(`${API_BASE}/api/projects`);
     const projects = await res.json();
- 
+
     if (!projects.length) {
       historyList.innerHTML = "<li>No saved projects yet.</li>";
       return;
     }
- 
+
     historyList.innerHTML = "";
     projects.forEach((p) => {
       const li = document.createElement("li");
@@ -123,11 +146,21 @@ async function loadHistory() {
       li.addEventListener("click", () => showHistoryItem(p));
       historyList.appendChild(li);
     });
+
+    // Search filter
+    historySearch.addEventListener("input", () => {
+      const query = historySearch.value.toLowerCase();
+      [...historyList.children].forEach(li => {
+        const snippet = li.querySelector(".snippet").textContent.toLowerCase();
+        li.style.display = snippet.includes(query) ? "" : "none";
+      });
+    });
+
   } catch (err) {
     historyList.innerHTML = "<li>Couldn't load history. Is the backend running?</li>";
   }
 }
- 
+
 async function showHistoryItem(project) {
   historyDetail.classList.remove("empty-state");
   historyDetail.innerHTML = `
@@ -142,7 +175,7 @@ async function showHistoryItem(project) {
       </div>
     </div>
   `;
- 
+
   try {
     const { svg } = await mermaid.render("historyDiagramSvg-" + project.id, project.mermaid_output);
     document.getElementById("historyDiagram").innerHTML = svg;
@@ -150,10 +183,31 @@ async function showHistoryItem(project) {
     document.getElementById("historyDiagram").innerHTML = `<p class="error">Couldn't render diagram.</p>`;
   }
 }
- 
+
 function escapeHtml(str) {
   const div = document.createElement("div");
   div.textContent = str;
   return div.innerHTML;
 }
- 
+
+// ---------- Toast notifications ----------
+function showToast(message) {
+  const toast = document.getElementById("toast");
+  toast.textContent = message;
+  toast.classList.add("show");
+  toast.classList.remove("hidden");
+
+  setTimeout(() => {
+    toast.classList.remove("show");
+    toast.classList.add("hidden");
+  }, 3000);
+}
+
+// ---------- Theme toggle ----------
+const themeToggle = document.getElementById("themeToggle");
+themeToggle.addEventListener("click", () => {
+  document.body.classList.toggle("light-theme");
+  const isLight = document.body.classList.contains("light-theme");
+  themeToggle.textContent = isLight ? "☀️" : "🌙";
+  showToast(isLight ? "Light mode enabled" : "Dark mode enabled");
+});
