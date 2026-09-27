@@ -184,6 +184,7 @@ async function showHistoryItem(project) {
       <div class="card">
         <h2>Diagram</h2>
         <div id="historyDiagram"></div>
+        <button id="downloadHistoryDiagram">Download Diagram</button>
       </div>
       <div class="card">
         <h2>Explanation</h2>
@@ -195,6 +196,39 @@ async function showHistoryItem(project) {
   try {
     const { svg } = await mermaid.render("historyDiagramSvg-" + project.id, project.mermaid_output);
     document.getElementById("historyDiagram").innerHTML = svg;
+
+    // Download button logic
+    const downloadBtn = document.getElementById("downloadHistoryDiagram");
+    downloadBtn.addEventListener("click", () => {
+      const svgElement = document.querySelector("#historyDiagram svg");
+      if (!svgElement) {
+        showToast("No diagram to download");
+        return;
+      }
+      const svgData = new XMLSerializer().serializeToString(svgElement);
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      const img = new Image();
+
+      const svgBlob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
+      const url = URL.createObjectURL(svgBlob);
+
+      img.onload = () => {
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.drawImage(img, 0, 0);
+        URL.revokeObjectURL(url);
+
+        const pngUrl = canvas.toDataURL("image/png");
+        const link = document.createElement("a");
+        link.href = pngUrl;
+        link.download = "history_diagram.png";
+        link.click();
+        showToast("History diagram downloaded!");
+      };
+
+      img.src = url;
+    });
   } catch (e) {
     document.getElementById("historyDiagram").innerHTML = `<p class="error">Couldn't render diagram.</p>`;
   }
