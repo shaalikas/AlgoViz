@@ -64,6 +64,22 @@ nav {
     border-color: var(--accent);
 }
 
+/* Theme toggle button */
+#themeToggle {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 8px 16px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-size: 0.875rem;
+    transition: all 0.15s ease;
+}
+#themeToggle:hover {
+    color: var(--text);
+    border-color: var(--accent);
+}
+
 main {
     padding: 32px;
     max-width: 1200px;
@@ -136,6 +152,22 @@ button#generateBtn:hover {
 button#generateBtn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+}
+
+/* Download button */
+#downloadDiagram {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 10px;
+    border-radius: var(--radius);
+    font-size: 0.875rem;
+    cursor: pointer;
+    margin-top: 12px;
+    transition: background 0.15s ease;
+}
+#downloadDiagram:hover {
+    background: var(--accent-hover);
 }
 
 .error {
@@ -229,6 +261,21 @@ button#generateBtn:disabled {
     letter-spacing: 0.04em;
 }
 
+#historySearch {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: #0d0f13;
+    color: var(--text);
+    margin-bottom: 12px;
+    font-size: 0.875rem;
+}
+#historySearch:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
 #historyList {
     list-style: none;
     display: flex;
@@ -265,6 +312,27 @@ button#generateBtn:disabled {
     font-size: 0.75rem;
     margin-top: 4px;
     display: block;
+}
+
+/* Toast notifications */
+#toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: var(--accent);
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: var(--radius);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    font-size: 0.875rem;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    z-index: 9999;
+}
+#toast.show {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 @media (max-width: 800px) {
