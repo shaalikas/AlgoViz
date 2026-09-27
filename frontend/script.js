@@ -184,7 +184,8 @@ async function showHistoryItem(project) {
       <div class="card">
         <h2>Diagram</h2>
         <div id="historyDiagram"></div>
-        <button id="downloadHistoryDiagram">Download Diagram</button>
+        <button id="downloadHistoryDiagramPNG">Download PNG</button>
+        <button id="downloadHistoryDiagramSVG">Download SVG</button>
       </div>
       <div class="card">
         <h2>Explanation</h2>
@@ -197,14 +198,11 @@ async function showHistoryItem(project) {
     const { svg } = await mermaid.render("historyDiagramSvg-" + project.id, project.mermaid_output);
     document.getElementById("historyDiagram").innerHTML = svg;
 
-    // Download button logic
-    const downloadBtn = document.getElementById("downloadHistoryDiagram");
-    downloadBtn.addEventListener("click", () => {
+    // PNG download
+    document.getElementById("downloadHistoryDiagramPNG").addEventListener("click", () => {
       const svgElement = document.querySelector("#historyDiagram svg");
-      if (!svgElement) {
-        showToast("No diagram to download");
-        return;
-      }
+      if (!svgElement) return showToast("No diagram to download");
+
       const svgData = new XMLSerializer().serializeToString(svgElement);
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d");
@@ -224,11 +222,30 @@ async function showHistoryItem(project) {
         link.href = pngUrl;
         link.download = "history_diagram.png";
         link.click();
-        showToast("History diagram downloaded!");
+        showToast("History diagram downloaded as PNG!");
       };
 
       img.src = url;
     });
+
+    // SVG download
+    document.getElementById("downloadHistoryDiagramSVG").addEventListener("click", () => {
+      const svgElement = document.querySelector("#historyDiagram svg");
+      if (!svgElement) return showToast("No diagram to download");
+
+      const svgData = new XMLSerializer().serializeToString(svgElement);
+      const blob = new Blob([svgData], { type: "image/svg+xml" });
+      const url = URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "history_diagram.svg";
+      link.click();
+      URL.revokeObjectURL(url);
+
+      showToast("History diagram downloaded as SVG!");
+    });
+
   } catch (e) {
     document.getElementById("historyDiagram").innerHTML = `<p class="error">Couldn't render diagram.</p>`;
   }
