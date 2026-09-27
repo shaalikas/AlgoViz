@@ -2,73 +2,89 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AlogoViz</title>
-    <link rel="stylesheet" href="style.css" />
-    <button id="themeToggle">🌙</button>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AlogoViz</title>
+  <link rel="stylesheet" href="style.css" />
+  <!-- ✅ Favicon -->
+  <link rel="icon" href="assets/favicon.ico" />
 </head>
 
 <body>
 
-    <header class="topbar">
-        <h1>AlogoViz</h1>
-        <nav>
-            <button id="viewGenerate" class="nav-btn active">Generate</button>
-            <button id="viewHistory" class="nav-btn">History</button>
-        </nav>
-    </header>
+  <!-- ✅ Topbar -->
+  <header class="topbar">
+    <h1>AlogoViz</h1>
+    <nav>
+      <button id="viewGenerate" class="nav-btn active">Generate</button>
+      <button id="viewHistory" class="nav-btn">History</button>
+      <!-- ✅ Theme toggle button belongs here, not inside <head> -->
+      <button id="themeToggle" class="nav-btn">🌙</button>
+    </nav>
+  </header>
 
-    <main>
-        <!-- GENERATE VIEW -->
-        <section id="generateView" class="view">
-            <div class="panel input-panel">
-                <label for="codeInput">Paste your code</label>
-                <textarea id="codeInput"
-                    placeholder="function main() {&#10;  fetchData();&#10;  processData();&#10;}"></textarea>
-                <button id="generateBtn">Generate Diagram</button>
-                <p id="errorMsg" class="error hidden"></p>
-            </div>
+  <main>
+    <!-- GENERATE VIEW -->
+    <section id="generateView" class="view">
+      <div class="panel input-panel">
+        <label for="codeInput">Paste your code</label>
+        <textarea id="codeInput"
+          placeholder="function main() {&#10;  fetchData();&#10;  processData();&#10;}"></textarea>
+        <button id="generateBtn">Generate Diagram</button>
+        <p id="errorMsg" class="error hidden"></p>
+      </div>
 
-            <div class="panel output-panel">
-                <div id="loading" class="hidden">
-                    <div class="spinner"></div>
-                    <span>Analyzing code…</span>
-                </div>
+      <div class="panel output-panel">
+        <div id="loading" class="hidden">
+          <div class="spinner"></div>
+          <span>Analyzing code…</span>
+        </div>
 
-                <div id="results" class="hidden">
-                    <div class="card">
-                        <h2>Diagram</h2>
-                        <div id="diagram"></div>
-                    </div>
-                    <div class="card">
-                        <h2>Explanation</h2>
-                        <p id="explanation"></p>
-                    </div>
-                </div>
+        <div id="results" class="hidden">
+          <div class="card">
+            <h2>Diagram</h2>
+            <div id="diagram"></div>
+            <!-- ✅ Download button -->
+            <button id="downloadDiagram">Download Diagram</button>
+          </div>
+          <div class="card">
+            <h2>Explanation</h2>
+            <p id="explanation"></p>
+          </div>
+        </div>
 
-                <div id="emptyState" class="empty-state">
-                    <p>Your diagram and explanation will appear here.</p>
-                </div>
-            </div>
-        </section>
+        <div id="emptyState" class="empty-state">
+          <p>Your diagram and explanation will appear here.</p>
+        </div>
+      </div>
+    </section>
 
-        <!-- HISTORY VIEW -->
-        <section id="historyView" class="view hidden">
-            <div class="panel list-panel">
-                <h2>Past Projects</h2>
-                <ul id="historyList"></ul>
-            </div>
-            <div class="panel output-panel">
-                <div id="historyDetail" class="empty-state">
-                    <p>Select a project to view its diagram.</p>
-                </div>
-            </div>
-        </section>
-    </main>
+    <!-- HISTORY VIEW -->
+    <section id="historyView" class="view hidden">
+      <div class="panel list-panel">
+        <h2>Past Projects</h2>
+        <!-- ✅ Optional search bar -->
+        <input type="text" id="historySearch" placeholder="Search projects..." />
+        <ul id="historyList"></ul>
+      </div>
+      <div class="panel output-panel">
+        <div id="historyDetail" class="empty-state">
+          <p>Select a project to view its diagram.</p>
+        </div>
+      </div>
+    </section>
+  </main>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
-    <script src="script.js"></script>
+  <!-- ✅ Toast notifications -->
+  <div id="toast" class="hidden"></div>
+
+  <!-- ✅ Footer -->
+  <footer class="footer">
+    <p>© 2026 AlogoViz — Built with ❤️</p>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+  <script src="script.js"></script>
 </body>
 
 </html>
