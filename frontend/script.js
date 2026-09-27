@@ -90,15 +90,31 @@ downloadBtn.addEventListener("click", () => {
     showToast("No diagram to download");
     return;
   }
+
+  // Convert SVG to PNG
   const svgData = new XMLSerializer().serializeToString(svgElement);
-  const blob = new Blob([svgData], { type: "image/svg+xml" });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = "diagram.svg";
-  link.click();
-  URL.revokeObjectURL(url);
-  showToast("Diagram downloaded!");
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
+  const img = new Image();
+
+  const svgBlob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
+  const url = URL.createObjectURL(svgBlob);
+
+  img.onload = () => {
+    canvas.width = img.width;
+    canvas.height = img.height;
+    ctx.drawImage(img, 0, 0);
+    URL.revokeObjectURL(url);
+
+    const pngUrl = canvas.toDataURL("image/png");
+    const link = document.createElement("a");
+    link.href = pngUrl;
+    link.download = "diagram.png";
+    link.click();
+    showToast("Diagram downloaded as PNG!");
+  };
+
+  img.src = url;
 });
 
 // ---------- Loading/Error helpers ----------
