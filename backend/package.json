@@ -1,0 +1,22 @@
+{
+    "name": "code-diagram-backend",
+    "version": "1.0.0",
+    "description": "Backend for Code-to-Diagram Visualizer",
+    "main": "server.js",
+    "scripts": {
+        "start": "node server.js",
+        "dev": "nodemon server.js"
+    },
+    "dependencies": {
+        "@anthropic-ai/sdk": "^0.32.1",
+        "@babel/parser": "^7.25.0",
+        "@babel/traverse": "^7.25.0",
+        "cors": "^2.8.5",
+        "dotenv": "^16.4.5",
+        "express": "^4.19.2",
+        "pg": "^8.12.0"
+    },
+    "devDependencies": {
+        "nodemon": "^3.1.4"
+    }
+}
